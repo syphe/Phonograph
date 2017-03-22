@@ -46,6 +46,7 @@ import com.kabouzeid.gramophone.helper.PlayingNotificationHelper;
 import com.kabouzeid.gramophone.helper.ShuffleHelper;
 import com.kabouzeid.gramophone.helper.StopWatch;
 import com.kabouzeid.gramophone.model.Song;
+import com.kabouzeid.gramophone.mtc.MTCState;
 import com.kabouzeid.gramophone.provider.HistoryStore;
 import com.kabouzeid.gramophone.provider.MusicPlaybackQueueStore;
 import com.kabouzeid.gramophone.provider.SongPlayCountStore;
@@ -159,6 +160,8 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
 
     private Handler uiThreadHandler;
 
+    private MTCState mtcState;
+
     private static String getTrackUri(@NonNull Song song) {
         return MusicUtil.getSongFileUri(song.id).toString();
     }
@@ -166,6 +169,8 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mtcState = new MTCState(this);
 
         playingNotificationHelper = new PlayingNotificationHelper(this);
 
@@ -776,6 +781,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
         synchronized (this) {
             if (requestFocus()) {
                 if (!playback.isPlaying()) {
+                    mtcState.AvChannelEnter();
                     if (!playback.isInitialized()) {
                         playSongAt(getPosition());
                     } else {
@@ -1149,6 +1155,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
                             // at an attenuated level
                             removeMessages(UNDUCK);
                             sendEmptyMessage(DUCK);
+                            Toast.makeText(service, "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK", Toast.LENGTH_SHORT).show();
                             break;
                     }
                     break;

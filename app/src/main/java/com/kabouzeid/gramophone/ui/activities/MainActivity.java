@@ -37,6 +37,8 @@ import com.kabouzeid.gramophone.loader.AlbumLoader;
 import com.kabouzeid.gramophone.loader.ArtistSongLoader;
 import com.kabouzeid.gramophone.loader.PlaylistSongLoader;
 import com.kabouzeid.gramophone.model.Song;
+import com.kabouzeid.gramophone.mtc.MTCKeysBroadcastReceiver;
+import com.kabouzeid.gramophone.mtc.MTCState;
 import com.kabouzeid.gramophone.service.MusicService;
 import com.kabouzeid.gramophone.ui.activities.base.AbsSlidingMusicPanelActivity;
 import com.kabouzeid.gramophone.ui.activities.intro.AppIntroActivity;
@@ -73,10 +75,15 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
 
     private boolean blockRequestPermissions;
 
+    private MTCKeysBroadcastReceiver mtcKeysBroadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
+
+        mtcKeysBroadcastReceiver = new MTCKeysBroadcastReceiver();
+        registerReceiver(mtcKeysBroadcastReceiver, mtcKeysBroadcastReceiver.getIntentFilter());
 
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
             Util.setStatusBarTranslucent(getWindow());
@@ -106,6 +113,13 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
         if (!checkShowIntro()) {
             checkShowChangelog();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(this.mtcKeysBroadcastReceiver);
     }
 
     private void setMusicChooser(int key) {

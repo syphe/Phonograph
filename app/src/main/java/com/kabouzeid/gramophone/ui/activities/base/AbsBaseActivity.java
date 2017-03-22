@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.kabouzeid.appthemehelper.ThemeStore;
 import com.kabouzeid.gramophone.R;
+import com.kabouzeid.gramophone.mtc.MTCState;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -28,6 +29,8 @@ public abstract class AbsBaseActivity extends AbsThemeActivity {
     private String[] permissions;
     private String permissionDeniedMessage;
 
+    private MTCState mtcState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +40,8 @@ public abstract class AbsBaseActivity extends AbsThemeActivity {
         hadPermissions = hasPermissions();
 
         setPermissionDeniedMessage(null);
+
+        mtcState = new MTCState(this);
     }
 
     @Override
@@ -50,6 +55,9 @@ public abstract class AbsBaseActivity extends AbsThemeActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        mtcState.AvChannelEnter();
+
         final boolean hasPermissions = hasPermissions();
         if (hasPermissions != hadPermissions) {
             hadPermissions = hasPermissions;
