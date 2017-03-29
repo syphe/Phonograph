@@ -45,6 +45,7 @@ import com.kabouzeid.gramophone.appwidgets.AppWidgetClassic;
 import com.kabouzeid.gramophone.appwidgets.AppWidgetSmall;
 import com.kabouzeid.gramophone.glide.BlurTransformation;
 import com.kabouzeid.gramophone.glide.SongGlideRequest;
+import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
 import com.kabouzeid.gramophone.helper.ShuffleHelper;
 import com.kabouzeid.gramophone.helper.StopWatch;
 import com.kabouzeid.gramophone.model.Song;
@@ -221,6 +222,10 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
         mediaSession.setActive(true);
 
         sendBroadcast(new Intent("com.kabouzeid.gramophone.PHONOGRAPH_MUSIC_SERVICE_CREATED"));
+
+        if (mtcState.getIsPlaying()) {
+            MusicPlayerRemote.resumePlaying();
+        }
     }
 
     private AudioManager getAudioManager() {
@@ -796,6 +801,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
         if (playback.isPlaying()) {
             playback.pause();
             notifyChange(PLAY_STATE_CHANGED);
+            mtcState.setIsPlaying(false);
         }
     }
 
@@ -804,6 +810,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
             if (requestFocus()) {
                 if (!playback.isPlaying()) {
                     mtcState.AvChannelEnter();
+                    mtcState.setIsPlaying(true);
                     if (!playback.isInitialized()) {
                         playSongAt(getPosition());
                     } else {
