@@ -15,14 +15,14 @@ import com.kabouzeid.gramophone.App;
  */
 
 public class MTCState {
+    private static boolean shouldAutoPlay = true;
+
     private Context context;
     private AudioManager audioManager;
 
     public MTCState(Context context) {
         this.context = context;
         this.audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-
-
     }
 
     public void AvChannelEnter() {
@@ -42,5 +42,13 @@ public class MTCState {
     public boolean getIsPlaying() {
         boolean isPlaying = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("mtcIsPlaying", false);
         return isPlaying;
+    }
+
+    public static boolean getShouldAutoPlay() {
+        return MTCState.shouldAutoPlay;
+    }
+
+    public static void setShouldAutoPlay(boolean shouldAutoPlay) {
+        MTCState.shouldAutoPlay = shouldAutoPlay;
     }
 }

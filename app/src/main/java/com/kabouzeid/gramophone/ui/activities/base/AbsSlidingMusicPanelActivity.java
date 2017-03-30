@@ -17,6 +17,7 @@ import android.view.animation.PathInterpolator;
 
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
+import com.kabouzeid.gramophone.mtc.MTCState;
 import com.kabouzeid.gramophone.ui.fragments.player.AbsPlayerFragment;
 import com.kabouzeid.gramophone.ui.fragments.player.MiniPlayerFragment;
 import com.kabouzeid.gramophone.ui.fragments.player.NowPlayingScreen;
@@ -52,11 +53,15 @@ public abstract class AbsSlidingMusicPanelActivity extends AbsMusicServiceActivi
     private ValueAnimator navigationBarColorAnimator;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
+    private MTCState mtcState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(createContentView());
         ButterKnife.bind(this);
+
+        mtcState = new MTCState(this);
 
         currentNowPlayingScreen = PreferenceUtil.getInstance(this).getNowPlayingScreen();
         Fragment fragment; // must implement AbsPlayerFragment
@@ -107,6 +112,14 @@ public abstract class AbsSlidingMusicPanelActivity extends AbsMusicServiceActivi
         if (currentNowPlayingScreen != PreferenceUtil.getInstance(this).getNowPlayingScreen()) {
             postRecreate();
         }
+
+        // only do this once, once the activity has resumed itself, if we were playing last time the app was open expand the now playing panel.
+        if (MTCState.getShouldAutoPlay()) {
+            if (mtcState.getIsPlaying()) {
+                expandPanel();
+            }
+            MTCState.setShouldAutoPlay(false);
+        }
     }
 
     public void setAntiDragView(View antiDragView) {
@@ -120,6 +133,10 @@ public abstract class AbsSlidingMusicPanelActivity extends AbsMusicServiceActivi
         super.onServiceConnected();
         if (!MusicPlayerRemote.getPlayingQueue().isEmpty()) {
             hideBottomBar(false);
+
+            if (mtcState.getIsPlaying() && !MusicPlayerRemote.isPlaying()) {
+                MusicPlayerRemote.resumePlaying();
+            }
         } // don't call hideBottomBar(true) here as it causes a bug with the SlidingUpPanelLayout
     }
 

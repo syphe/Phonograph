@@ -224,10 +224,6 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
         mediaSession.setActive(true);
 
         sendBroadcast(new Intent("com.kabouzeid.gramophone.PHONOGRAPH_MUSIC_SERVICE_CREATED"));
-
-        if (mtcState.getIsPlaying()) {
-            MusicPlayerRemote.resumePlaying();
-        }
     }
 
     private AudioManager getAudioManager() {
